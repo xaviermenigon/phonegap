@@ -1,0 +1,19 @@
+.red_title {
+	color :red ;
+	transition: all 0.5s;
+}
+
+.blue_title {
+	color : blue;
+	text-transform: uppercase;
+	transition: all 0.5s;
+}
+
+.blue_title span {
+	color: green;
+}
+
+.active {
+	font-size :30px;
+	transition : all 0.5s;
+}

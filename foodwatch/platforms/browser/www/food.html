@@ -1,0 +1,91 @@
+<template>
+  <div class="page">
+    <div class="navbar">
+      <div class="navbar-inner sliding">
+        <div class="left">
+          <a href="#" class="link back">
+            <i class="icon icon-back"></i>
+            <span class="ios-only">Back</span>
+          </a>
+        </div>
+        <div class="title">Food</div>
+      </div>
+    </div>
+    <div class="page-content">
+      <form class="list" id="my-form">
+        <ul>
+          <li>
+            <div class="item-content item-input">
+              <div class="item-inner">
+                <div class="item-title item-label">Barcode</div>
+                <div class="item-input-wrap">
+                  <input id="barcode" type="number" placeholder="Product BarCode">
+                </div>
+              </div>
+            </div>
+          </li>
+        </ul>
+        <div class="block block-strong row">
+          <div class="col"><button @click="checkAPI" class="button convert-form-to-data">Check</button></div>
+        </div>
+        <div class="block-title">{{marque}}</div>
+        <div class="card">
+          <div class="card-header">{{title}}<img src={{photo}} alt="photo" width=60 ></div>
+          <div class="card-content card-content-padding">{{description}}</div>
+        </div>
+        <div class="block-title">Ingrédients</div>
+        <div class="card">
+          <div class="card-content card-content-padding">{{ingredients}}</div>
+        </div>
+        <div class="block-title">NOVA</div>
+        <div class="card">
+          <div class="card-header">{{nova_group_text}}  <img src={{nova_group_logo}} alt="nova_group_logo" width=40></div>
+        </div>
+        <div class="block-title">Nutriscore</div>
+        <div class="card-header"><span class="center"><img src={{nutriscore_logo}} alt="nutriscore_logo" width=200></span></div>
+      </div>
+    </form>
+  </div>
+</div>
+</template>
+
+<script>
+  var nova_group_types=["Aliments non transformés ou transformés minimalement","Ingrédients culinaires transformés","Aliments transformés","Produits alimentaires et boissons ultra-transformés"]
+
+  // script must return component object
+  return {
+    data: function () {
+      return {
+        title:"",
+        description:"",
+        marque:"",
+        ingredients:"",
+        nova_group_id:"",
+        nova_group_text:"",
+        photo:"",
+        nova_group_logo:""
+      }
+    },
+    methods: {
+      checkAPI: function (e) {
+        e.preventDefault();
+        var product_barcode=$$('#barcode').val();
+        var url = "https://fr.openfoodfacts.org/api/v0/produit/"+product_barcode+".json"
+        var self = this
+        app.request.json(url, function(data) {
+          self.$setState({
+            title: data.product.product_name_fr,
+            description: data.product.generic_name_fr,
+            photo: data.product.selected_images.front.small.fr,
+            marque : data.product.brands,
+            ingredients : data.product.ingredients_text_with_allergens,
+            nova_group_id:data.product.nova_groups,
+            nova_group_text:nova_group_types[parseInt(data.product.nova_groups)-1],
+            nova_group_logo:"https://static.openfoodfacts.org/images/misc/nova-group-"+data.product.nova_groups+".svg",
+            nutriscore_logo:"https://static.openfoodfacts.org/images/misc/nutriscore-"+data.product.nutrition_grades+".svg"
+          })
+        })
+      }
+    }
+  }
+</script>
