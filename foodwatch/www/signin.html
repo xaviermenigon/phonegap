@@ -1,0 +1,76 @@
+<template>
+  <div class="page">
+    <div class="page-content login-screen-content">
+      <div class="login-screen-title">FoodWatch</div>
+      <form>
+        <div class="list">
+          <ul>
+            <li class="item-content item-input">
+              <div class="item-inner">
+                <div class="item-title item-label">E-mail</div>
+                <div class="item-input-wrap">
+                  <input id="email" type="email" name="email" placeholder="Votre E-mail">
+                </div>
+              </div>
+            </li>
+            <li class="item-content item-input">
+              <div class="item-inner">
+                <div class="item-title item-label">Mot de passe</div>
+                <div class="item-input-wrap">
+                  <input id="password" type="password" name="password" placeholder="Votre mot de passe">
+                </div>
+              </div>
+            </li>
+          </ul>
+        </div>
+        <div class="list">
+          <ul>
+            <li><a class="item-link list-button" id="signin-btn" href="#">Se connecter</a></li>
+          </ul>
+          <div class="block-footer">
+            <p><a class="link back">Fermer l'onglet de connexion</a></p>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</template>
+
+
+<script>
+  // script must return component object
+  return {
+    on: {
+      pageInit: function () {
+        $$("#signin-btn").on("click", function(e) {
+          app.request.post("https://foxxy.ovh/_db/ema_api/api/auth/login", JSON.stringify({
+            "email": $$("#email").val(),
+            "password": $$("#password").val()
+          }), function(data, s, h){
+            data = JSON.parse(data)
+            if(data.success) {
+              window.localStorage.setItem("jwt", h.getResponseHeader('X-Session-Id'))
+              $$("#fav").removeClass("hidden")
+              $$("#logout").removeClass("hidden")
+              $$("#signin").addClass("hidden")
+              $$("#signup").addClass("hidden")
+              mainView.router.back()
+            } else {
+              var notificationFull = app.notification.create({
+                title: 'FoodWatch',
+                titleRightText: 'now',
+                subtitle: 'Mauvais identifiant ou mot de passe',
+                text: 'Vérifiez vos identifiants de connexion',
+                closeTimeout: 3000,
+              });
+              notificationFull.open();
+            }
+          })
+        })
+      },
+    }
+  }
+</script>
+
+
+
